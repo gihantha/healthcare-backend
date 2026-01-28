@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:5.0
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+  app:
+    build: .
+    command: node index.js
+    ports:
+      - 3000:3000
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/hospital
+      - JWT_SECRET=jwt_secret
+      - QR_SECRET=qr_secret
+    depends_on:
+      - mongo
+volumes:
+  mongo_data:

@@ -1,0 +1,7 @@
+node_modules
+.env
+plan
+/backend/.env
+.env.dev
+/frontend/.env.local
+/frontend/.env.production

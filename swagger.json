@@ -1,0 +1,64 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Government Hospital Backend API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "summary": "Login with NIC and password",
+        "requestBody": { "required": true },
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/auth/create-user": {
+      "post": {
+        "summary": "Admin creates a user",
+        "requestBody": { "required": true },
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/patient/register": {
+      "post": {
+        "summary": "Register a new patient",
+        "requestBody": { "required": true },
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/visit/create": {
+      "post": {
+        "summary": "Create a new visit and generate QR",
+        "requestBody": { "required": true },
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/doctor/history": {
+      "get": {
+        "summary": "Fetch patient medical history via QR",
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/doctor/add-record": {
+      "post": {
+        "summary": "Add diagnosis and prescriptions",
+        "requestBody": { "required": true },
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/pharmacy/prescription/{prescriptionId}": {
+      "get": {
+        "summary": "View prescription details (pharmacist)",
+        "parameters": [{ "name": "prescriptionId", "in": "path", "required": true }],
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/pharmacy/prescription/{prescriptionId}/issue": {
+      "post": {
+        "summary": "Mark prescription as issued",
+        "parameters": [{ "name": "prescriptionId", "in": "path", "required": true }],
+        "responses": { "200": { "description": "Success" } }
+      }
+    }
+  }
+}
