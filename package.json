@@ -2,9 +2,34 @@
   "name": "project",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
+   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "test": "cross-env NODE_ENV=test jest tests/ --testPathPattern=\\.test\\.js$ --detectOpenHandles --forceExit",
+    "test:report": "node tests/test-report.js",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage --testPathPattern=tests/.*\\.test\\.js$",
+    "test:all": "npm run test && npm run test:coverage && npm run test:report",
+    "test:ci": "npm run test:all",
+    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "test:auth": "cross-env NODE_ENV=test jest tests/auth.test.js --detectOpenHandles --forceExit",
+    "test:patient": "cross-env NODE_ENV=test jest tests/patient.test.js --detectOpenHandles --forceExit",
+    "test:doctor": "cross-env NODE_ENV=test jest tests/doctor.test.js --detectOpenHandles --forceExit",
+    "test:pharmacy": "cross-env NODE_ENV=test jest tests/pharmacy.test.js --detectOpenHandles --forceExit",
+    "test:visit": "cross-env NODE_ENV=test jest tests/visit.test.js --detectOpenHandles --forceExit",
+    "test:audit": "cross-env NODE_ENV=test jest tests/audit.test.js --detectOpenHandles --forceExit",
+    "test:integration": "cross-env NODE_ENV=test jest tests/integration.test.js --detectOpenHandles --forceExit",
+
+    "setup": "node tests/setup.js",
+    "check-setup": "node -e \"const mongoose = require('mongoose'); mongoose.connect(process.env.MONGO_URI).then(() => { console.log('Connected to MongoDB'); return mongoose.connection.db.collection('users').countDocuments(); }).then(count => { console.log('Total users:', count); mongoose.disconnect(); }).catch(err => console.error('Error:', err));\""
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
+    "babel-jest": "^30.2.0",
+    "cross-env": "^10.1.0",
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^9.5.0",
+    "supertest": "^6.3.4"
   },
   "keywords": [],
   "author": "",
@@ -23,7 +48,7 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "twilio": "^5.12.0",
-    "uuid": "^13.0.0"
+    "uuid": "^8.3.2"
   },
   "description": ""
 }

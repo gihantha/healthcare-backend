@@ -1,4 +1,3 @@
-//index.js
 const express = require("express");
 const mongoose = require("mongoose");
 const swaggerUi = require("swagger-ui-express");
@@ -23,11 +22,13 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-// Connect to MongoDB
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error(err));
+// Connect to MongoDB only if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  mongoose
+    .connect(process.env.MONGO_URI)
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => console.error(err));
+}
 
 // Routes
 app.use("/auth", require("./routes/authRoutes"));
@@ -59,5 +60,35 @@ app.use((err, req, res, next) => {
   res.status(status).json({ code, message: finalMessage });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Start server only if not in test environment
+if (process.env.NODE_ENV !== 'test' && require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+// Add this route before other routes
+app.get('/setup/check', async (req, res) => {
+  try {
+    const User = require('./models/User');
+    const userCount = await User.countDocuments();
+    const users = await User.find().select('nic name role createdAt').lean();
+    
+    res.json({
+      success: true,
+      database: 'connected',
+      userCount,
+      users,
+      isFirstTimeSetup: userCount === 0,
+      message: userCount === 0 
+        ? 'No users found. Use POST /auth/create-user with admin data to create first user.' 
+        : 'System already has users.'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      database: 'error'
+    });
+  }
+});
+module.exports = app;

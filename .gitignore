@@ -1,7 +1,34 @@
-node_modules
-.env
+# Dependencies
+node_modules/
+
+# Environment variables (secrets)
+.env*
+!.env.example
+
+# Coverage & test artifacts
+coverage/
+test-results/
+reports/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker runtime data
+.docker/
+docker-data/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# Misc generated
 plan
-/backend/.env
-.env.dev
-/frontend/.env.local
-/frontend/.env.production
