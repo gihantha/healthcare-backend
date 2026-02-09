@@ -1,31 +1,68 @@
-const express = require('express');
-const router = express.Router();
-const Patient = require('../models/Patient');
-const parseNIC = require('../utils/nicParser');
-const roleGuard = require('../middleware/roleGuard');
+// controllers/patientController.js
+const PatientService = require("../services/patientService");
+const { success, error } = require("../utils/response");
 
-// Register patient (NURSE, MODERATOR only)
-router.post('/register', roleGuard(['NURSE', 'MODERATOR']), async (req, res) => {
-  const { name, address, phone, nic } = req.body;
+exports.registerPatient = async (req, res) => {
   try {
-    if (await Patient.findOne({ nic })) {
-      return res.status(400).json({ error: 'NIC already exists' });
-    }
-    const { dob, gender } = parseNIC(nic);
-    const patientId = 'P' + Date.now(); // Simple unique ID
-    const patient = new Patient({ patientId, name, address, phone, nic, dob, gender });
-    await patient.save();
-    // Send notification (email/SMS) if required
-    const notify = require('../utils/notifier');
-    notify({
-      to: phone,
-      type: 'sms',
-      message: `Patient registered. ID: ${patientId}`
-    });
-    res.json({ success: true, patientId });
+    const patient = await PatientService.registerPatient(req.body);
+    return success(
+      res,
+      { patientId: patient.patientId },
+      "Patient registered successfully"
+    );
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error(err);
+    return error(
+      res,
+      err.code || "SERVER_ERROR",
+      err.message || "Server error",
+      err.status || 500
+    );
   }
-});
+};
 
-module.exports = router;
+exports.searchPatient = async (req, res) => {
+  try {
+    const { nic } = req.query;
+    const patient = await PatientService.searchPatientByNIC(nic);
+    return success(res, {
+      patientId: patient.patientId,
+      name: patient.name,
+      phone: patient.phone,
+      address: patient.address,
+    });
+  } catch (err) {
+    console.error(err);
+    return error(
+      res,
+      err.code || "SERVER_ERROR",
+      err.message || "Server error",
+      err.status || 500
+    );
+  }
+};
+
+exports.reissuePatientId = async (req, res) => {
+  try {
+    const { nic } = req.body;
+    const ip =
+      req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+
+    const result = await PatientService.reissuePatientId(
+      nic,
+      req.user.userId,
+      req.user.role,
+      ip
+    );
+
+    return success(res, result, "Patient ID card reissued successfully");
+  } catch (err) {
+    console.error(err);
+    return error(
+      res,
+      err.code || "SERVER_ERROR",
+      err.message || "Server error",
+      err.status || 500
+    );
+  }
+};

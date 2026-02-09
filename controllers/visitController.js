@@ -1,20 +1,18 @@
-const express = require('express');
-const router = express.Router();
-const Visit = require('../models/Visit');
-const Patient = require('../models/Patient');
-const generateVisitQR = require('../utils/qrGenerator');
-const roleGuard = require('../middleware/roleGuard');
+// controllers/visitController.js
+const VisitService = require("../services/visitService");
+const { success, error } = require("../utils/response");
 
-// Create a new visit and generate QR
-router.post('/create', roleGuard(['NURSE', 'MODERATOR']), async (req, res) => {
-  const { patientId, unit } = req.body;
-  const patient = await Patient.findOne({ patientId });
-  if (!patient) return res.status(404).json({ error: 'Patient not found' });
-  const visitId = 'V' + Date.now();
-  const visit = new Visit({ visitId, patientId, unit });
-  await visit.save();
-  const { token, qrData } = await generateVisitQR({ patientId, visitId });
-  res.json({ visitId, qrToken: token, qrImage: qrData });
-});
-
-module.exports = router;
+exports.createVisit = async (req, res) => {
+  try {
+    const visit = await VisitService.createVisit(req.body);
+    return success(res, visit, "Visit created successfully");
+  } catch (err) {
+    console.error(err);
+    return error(
+      res,
+      err.code || "SERVER_ERROR",
+      err.message || "Server error",
+      err.status || 500
+    );
+  }
+};

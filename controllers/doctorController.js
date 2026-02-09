@@ -1,30 +1,49 @@
-const express = require('express');
-const router = express.Router();
-const MedicalRecord = require('../models/MedicalRecord');
-const roleGuard = require('../middleware/roleGuard');
-const qrValidator = require('../middleware/qrValidator');
+//controllers/doctorController.js
+const doctorService = require("../services/doctorService");
+const { success, error } = require("../utils/response");
 
-// Fetch patient medical history via QR (doctor only)
-router.get('/history', roleGuard(['DOCTOR']), qrValidator, async (req, res) => {
-  const { patientId } = req.qrPayload;
-  const records = await MedicalRecord.find({ patientId });
-  res.json(records);
-});
+exports.getPatientHistory = async (req, res) => {
+  try {
+    const { patientId } = req.qrPayload;
+    const records = await doctorService.getPatientHistory(patientId);
+    return success(res, records);
+  } catch (err) {
+    console.error(err);
+    return error(
+      res,
+      err.code || "SERVER_ERROR",
+      err.message || "Server error",
+      err.status || 500
+    );
+  }
+};
 
-// Add diagnosis and prescriptions (doctor only)
-router.post('/add-record', roleGuard(['DOCTOR']), qrValidator, async (req, res) => {
-  const { patientId, visitId } = req.qrPayload;
-  const { diagnosis, prescriptions, notes } = req.body;
-  const record = new MedicalRecord({
-    patientId,
-    visitId,
-    diagnosis,
-    prescriptions,
-    notes,
-    createdBy: req.user._id
-  });
-  await record.save();
-  res.json({ success: true });
-});
+exports.addMedicalRecord = async (req, res) => {
+  try {
+    const { patientId, visitId } = req.qrPayload;
+    const { diagnosis, prescriptions, notes } = req.body;
 
-module.exports = router;
+    const result = await doctorService.addMedicalRecord({
+      patientId,
+      visitId,
+      diagnosis,
+      prescriptions,
+      notes,
+      createdBy: req.user.userId,
+    });
+
+    return success(
+      res,
+      { prescriptionId: result.prescriptionId },
+      "Medical record added successfully"
+    );
+  } catch (err) {
+    console.error(err);
+    return error(
+      res,
+      err.code || "SERVER_ERROR",
+      err.message || "Server error",
+      err.status || 500
+    );
+  }
+};

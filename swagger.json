@@ -1,63 +1,1035 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.0.3",
   "info": {
-    "title": "Government Hospital Backend API",
-    "version": "1.0.0"
+    "title": "Government Hospital Management API",
+    "version": "1.0.0",
+    "description": "Secure API for government hospital system with role-based access control and QR-based workflows"
   },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development server"
+    },
+    {
+      "url": "https://api.hospital.gov.lk",
+      "description": "Production server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token from login endpoint"
+      },
+      "qrAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-qr-token",
+        "description": "QR token for doctor and pharmacy access"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "INVALID_TOKEN",
+              "LICENSE_EXPIRED",
+              "FORBIDDEN",
+              "BAD_REQUEST",
+              "NOT_FOUND",
+              "SERVER_ERROR",
+              "NIC_EXISTS",
+              "PATIENT_NOT_FOUND",
+              "VISIT_NOT_FOUND",
+              "ALREADY_ISSUED",
+              "VISIT_ALREADY_CLOSED",
+              "NO_QR",
+              "QR_EXPIRED",
+              "VISIT_CLOSED",
+              "INVALID_QR",
+              "NO_TOKEN",
+              "INVALID_CREDENTIALS",
+              "INVALID_JSON"
+            ]
+          },
+          "message": { "type": "string" }
+        },
+        "example": {
+          "code": "INVALID_TOKEN",
+          "message": "Invalid token"
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" },
+          "data": { "type": "object" }
+        }
+      },
+      "UserCreate": {
+        "type": "object",
+        "properties": {
+          "nic": {
+            "type": "string",
+            "description": "National Identity Card number (unique)",
+            "example": "199012345678"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name of the user"
+          },
+          "contact": {
+            "type": "string",
+            "description": "Contact phone number"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "MODERATOR",
+              "DOCTOR",
+              "NURSE",
+              "PHARMACIST",
+              "LAB"
+            ],
+            "description": "User role in the system"
+          },
+          "licenseExpiry": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Required for DOCTOR and NURSE roles only"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8,
+            "description": "Minimum 8 characters"
+          }
+        },
+        "required": ["nic", "name", "role", "password"]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "nic": { "type": "string" },
+          "name": { "type": "string" },
+          "contact": { "type": "string" },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "MODERATOR",
+              "DOCTOR",
+              "NURSE",
+              "PHARMACIST",
+              "LAB"
+            ]
+          },
+          "licenseExpiry": { "type": "string", "format": "date-time" }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "nic": {
+            "type": "string",
+            "example": "199012345678"
+          },
+          "password": {
+            "type": "string",
+            "example": "securepassword123"
+          }
+        },
+        "required": ["nic", "password"]
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "JWT access token (valid for 45 minutes)"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "JWT refresh token (valid for 7 days)"
+          },
+          "role": { "type": "string" }
+        }
+      },
+      "Patient": {
+        "type": "object",
+        "properties": {
+          "patientId": {
+            "type": "string",
+            "example": "P-123e4567-e89b-12d3-a456-426614174000",
+            "description": "Immutable unique patient identifier"
+          },
+          "name": { "type": "string" },
+          "address": { "type": "string" },
+          "phone": { "type": "string" },
+          "nic": {
+            "type": "string",
+            "description": "National Identity Card number (unique)"
+          },
+          "dob": {
+            "type": "string",
+            "format": "date",
+            "description": "Date of birth derived from NIC"
+          },
+          "gender": {
+            "type": "string",
+            "enum": ["M", "F"],
+            "description": "Gender derived from NIC"
+          },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PatientCreate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full name of the patient"
+          },
+          "address": {
+            "type": "string",
+            "description": "Residential address"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Contact phone number"
+          },
+          "nic": {
+            "type": "string",
+            "description": "Sri Lankan NIC (9 chars with V/X or 12 digits)",
+            "example": "199012345678"
+          }
+        },
+        "required": ["name", "nic"]
+      },
+      "PatientBasicInfo": {
+        "type": "object",
+        "properties": {
+          "patientId": { "type": "string" },
+          "name": { "type": "string" },
+          "phone": { "type": "string" },
+          "address": { "type": "string" }
+        }
+      },
+      "PatientReissueResponse": {
+        "type": "object",
+        "properties": {
+          "patientId": { "type": "string" },
+          "name": { "type": "string" },
+          "gender": { "type": "string" },
+          "dateOfBirth": { "type": "string", "format": "date" }
+        }
+      },
+      "Visit": {
+        "type": "object",
+        "properties": {
+          "visitId": {
+            "type": "string",
+            "example": "V-123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique visit identifier"
+          },
+          "patientId": {
+            "type": "string",
+            "example": "P-123e4567-e89b-12d3-a456-426614174000"
+          },
+          "unit": {
+            "type": "string",
+            "enum": ["OPD", "SPECIAL"],
+            "description": "OPD or special unit"
+          },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "closed": { "type": "boolean" },
+          "closedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "VisitCreate": {
+        "type": "object",
+        "properties": {
+          "patientId": {
+            "type": "string",
+            "example": "P-123e4567-e89b-12d3-a456-426614174000"
+          },
+          "unit": {
+            "type": "string",
+            "enum": ["OPD", "SPECIAL"]
+          }
+        },
+        "required": ["patientId", "unit"]
+      },
+      "VisitResponse": {
+        "type": "object",
+        "properties": {
+          "visitId": { "type": "string" },
+          "qrToken": {
+            "type": "string",
+            "description": "JWT token for QR access (valid for 1 hour)"
+          },
+          "qrImage": {
+            "type": "string",
+            "description": "Base64 encoded QR code image"
+          }
+        }
+      },
+      "MedicalRecord": {
+        "type": "object",
+        "properties": {
+          "patientId": { "type": "string" },
+          "visitId": { "type": "string" },
+          "diagnosis": { "type": "string" },
+          "prescriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrescriptionItem"
+            }
+          },
+          "notes": { "type": "string" },
+          "createdBy": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "MedicalRecordCreate": {
+        "type": "object",
+        "properties": {
+          "diagnosis": {
+            "type": "string",
+            "description": "Medical diagnosis"
+          },
+          "prescriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrescriptionCreate"
+            }
+          },
+          "notes": { "type": "string" }
+        },
+        "required": ["diagnosis"]
+      },
+      "Prescription": {
+        "type": "object",
+        "properties": {
+          "prescriptionId": {
+            "type": "string",
+            "example": "RX-123e4567-e89b-12d3-a456-426614174000"
+          },
+          "visitId": { "type": "string" },
+          "patientId": { "type": "string" },
+          "medicines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrescriptionItem"
+            }
+          },
+          "issued": { "type": "boolean" },
+          "issuedAt": { "type": "string", "format": "date-time" },
+          "issuedBy": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PrescriptionItem": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "dosage": { "type": "string" },
+          "frequency": { "type": "string" },
+          "duration": { "type": "string" },
+          "notes": { "type": "string" }
+        }
+      },
+      "PrescriptionCreate": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "dosage": { "type": "string" },
+          "frequency": { "type": "string" },
+          "duration": { "type": "string" },
+          "notes": { "type": "string" }
+        },
+        "required": ["name", "dosage"]
+      },
+      "AuditLog": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "role": { "type": "string" },
+          "action": {
+            "type": "string",
+            "enum": [
+              "REGISTER_PATIENT",
+              "REISSUE_PATIENT_ID",
+              "ISSUE_PRESCRIPTION",
+              "CREATE_VISIT",
+              "ADD_MEDICAL_RECORD",
+              "CREATE_USER",
+              "LOGIN"
+            ]
+          },
+          "visitId": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "ip": { "type": "string" },
+          "details": { "type": "object" }
+        }
+      },
+      "AuditLogQuery": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "role": { "type": "string" },
+          "action": { "type": "string" }
+        }
+      },
+      "AuditLogResponse": {
+        "type": "object",
+        "properties": {
+          "logs": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AuditLog" }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "page": { "type": "integer" },
+              "limit": { "type": "integer" },
+              "total": { "type": "integer" },
+              "pages": { "type": "integer" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
   "paths": {
     "/auth/login": {
       "post": {
-        "summary": "Login with NIC and password",
-        "requestBody": { "required": true },
-        "responses": { "200": { "description": "Success" } }
+        "security": [],
+        "tags": ["Authentication"],
+        "summary": "User login with NIC and password",
+        "description": "Authenticate user and return JWT tokens. For DOCTOR and NURSE roles, checks license expiry.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing credentials",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "License expired (for DOCTOR/NURSE)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
       }
     },
+
     "/auth/create-user": {
       "post": {
-        "summary": "Admin creates a user",
-        "requestBody": { "required": true },
-        "responses": { "200": { "description": "Success" } }
+        "tags": ["Authentication"],
+        "summary": "Create new user (ADMIN only)",
+        "description": "Create new system user. First user must be ADMIN. Subsequent users require ADMIN role.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or NIC exists",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - ADMIN role required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
       }
     },
+
     "/patient/register": {
       "post": {
-        "summary": "Register a new patient",
-        "requestBody": { "required": true },
-        "responses": { "200": { "description": "Success" } }
+        "tags": ["Patient Management"],
+        "summary": "Register new patient (NURSE/MODERATOR only)",
+        "description": "Register patient with NIC. Date of birth and gender are derived from NIC. Patient ID is generated automatically.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Patient registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "NIC exists or invalid NIC format",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - NURSE or MODERATOR role required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
       }
     },
+
+    "/patient/search": {
+      "get": {
+        "tags": ["Patient Management"],
+        "summary": "Search patient by NIC (NURSE/MODERATOR/DOCTOR)",
+        "description": "Search for patient using NIC number. Returns basic patient information only.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "nic",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Patient NIC number"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Patient found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientBasicInfo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Patient not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/patient/reissue-id": {
+      "post": {
+        "tags": ["Patient Management"],
+        "summary": "Reissue patient ID card (MODERATOR only)",
+        "description": "Reissue patient ID card. Requires MODERATOR role. Action is logged in audit trail.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nic": {
+                    "type": "string",
+                    "description": "Patient NIC number"
+                  }
+                },
+                "required": ["nic"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Patient ID reissued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientReissueResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Patient not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - MODERATOR role required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+
     "/visit/create": {
       "post": {
-        "summary": "Create a new visit and generate QR",
-        "requestBody": { "required": true },
-        "responses": { "200": { "description": "Success" } }
+        "tags": ["Visit Management"],
+        "summary": "Create new visit (NURSE/MODERATOR only)",
+        "description": "Create a new hospital visit with QR code for doctor access. QR expires in 1 hour.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VisitCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Visit created with QR code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisitResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Patient not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - NURSE or MODERATOR role required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
       }
     },
+
     "/doctor/history": {
       "get": {
-        "summary": "Fetch patient medical history via QR",
-        "responses": { "200": { "description": "Success" } }
+        "tags": ["Doctor"],
+        "summary": "Get patient medical history via QR (DOCTOR only)",
+        "description": "Access patient medical history using QR token. Doctor must have valid license.",
+        "security": [{ "bearerAuth": [] }, { "qrAuth": [] }],
+        "parameters": [
+          {
+            "name": "x-qr-token",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "QR JWT token from visit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Medical records retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/MedicalRecord" }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired QR token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - DOCTOR role required or license expired",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
       }
     },
+
     "/doctor/add-record": {
       "post": {
-        "summary": "Add diagnosis and prescriptions",
-        "requestBody": { "required": true },
-        "responses": { "200": { "description": "Success" } }
+        "tags": ["Doctor"],
+        "summary": "Add diagnosis and prescriptions (DOCTOR only)",
+        "description": "Add medical record and prescriptions for current visit. Requires valid QR token.",
+        "security": [{ "bearerAuth": [] }, { "qrAuth": [] }],
+        "parameters": [
+          {
+            "name": "x-qr-token",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "QR JWT token from visit"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MedicalRecordCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Medical record added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired QR token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - DOCTOR role required or license expired",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
       }
     },
+
     "/pharmacy/prescription/{prescriptionId}": {
       "get": {
-        "summary": "View prescription details (pharmacist)",
-        "parameters": [{ "name": "prescriptionId", "in": "path", "required": true }],
-        "responses": { "200": { "description": "Success" } }
+        "tags": ["Pharmacy"],
+        "summary": "Get prescription details (PHARMACIST only)",
+        "description": "View prescription details. Pharmacist cannot see diagnosis or medical history.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "prescriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "RX-123e4567-e89b-12d3-a456-426614174000"
+            },
+            "description": "Prescription ID from medical record"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Prescription details",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Prescription" }
+              }
+            }
+          },
+          "404": {
+            "description": "Prescription not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - PHARMACIST role required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
       }
     },
+
     "/pharmacy/prescription/{prescriptionId}/issue": {
       "post": {
-        "summary": "Mark prescription as issued",
-        "parameters": [{ "name": "prescriptionId", "in": "path", "required": true }],
-        "responses": { "200": { "description": "Success" } }
+        "tags": ["Pharmacy"],
+        "summary": "Issue prescription (PHARMACIST only)",
+        "description": "Mark prescription as issued. This action closes the visit and expires QR code.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "prescriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "RX-123e4567-e89b-12d3-a456-426614174000"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Prescription issued successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Prescription already issued",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "404": {
+            "description": "Prescription not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - PHARMACIST role required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/audit/logs": {
+      "get": {
+        "tags": ["Audit"],
+        "summary": "Get audit logs (ADMIN only)",
+        "description": "Retrieve system audit logs. Audit logs are immutable and cannot be modified.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1, "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audit logs retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - ADMIN role required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/example/admin-only": {
+      "get": {
+        "tags": ["Example"],
+        "summary": "Example admin-only endpoint",
+        "description": "Example protected route requiring ADMIN role",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Access granted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - ADMIN role required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
       }
     }
   }

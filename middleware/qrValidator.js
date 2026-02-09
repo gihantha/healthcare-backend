@@ -1,24 +1,35 @@
-// QR validation middleware (JWT/HMAC based)
-const jwt = require('jsonwebtoken');
-const Visit = require('../models/Visit');
+//middleware/qrValidator.js
+const jwt = require("jsonwebtoken");
+const Visit = require("../models/Visit");
 
 module.exports = async function qrValidator(req, res, next) {
-  const qrToken = req.headers['x-qr-token'] || req.query.qrToken;
-  if (!qrToken) return res.status(401).json({ error: 'QR token required' });
+  const qrToken = req.headers["x-qr-token"] || req.query.qrToken;
+  if (!qrToken)
+    return res
+      .status(401)
+      .json({ code: "NO_QR", message: "QR token required" });
+
   try {
-    const payload = jwt.verify(qrToken, process.env.QR_SECRET || 'qr_secret');
-    // Check expiry
+    const payload = jwt.verify(qrToken, process.env.QR_SECRET || "qr_secret");
+
     if (payload.exp && Date.now() >= payload.exp * 1000) {
-      return res.status(401).json({ error: 'QR expired' });
+      return res
+        .status(401)
+        .json({ code: "QR_EXPIRED", message: "QR expired" });
     }
-    // Optionally check visit closed
+
     const visit = await Visit.findOne({ visitId: payload.visitId });
     if (!visit || visit.closed) {
-      return res.status(401).json({ error: 'Visit closed or not found' });
+      return res
+        .status(401)
+        .json({ code: "VISIT_CLOSED", message: "Visit closed or not found" });
     }
+
     req.qrPayload = payload;
     next();
-  } catch (err) {
-    return res.status(401).json({ error: 'Invalid QR token' });
+  } catch {
+    return res
+      .status(401)
+      .json({ code: "INVALID_QR", message: "Invalid QR token" });
   }
 };

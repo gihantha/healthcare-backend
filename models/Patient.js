@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+// models/Patient.js
+const mongoose = require("mongoose");
 
 const PatientSchema = new mongoose.Schema({
   patientId: { type: String, unique: true, required: true, immutable: true },
@@ -7,8 +8,8 @@ const PatientSchema = new mongoose.Schema({
   phone: { type: String },
   nic: { type: String, unique: true, required: true },
   dob: { type: Date, required: true },
-  gender: { type: String, enum: ['M', 'F', 'X'], required: true },
-  createdAt: { type: Date, default: Date.now }
+  gender: { type: String, enum: ["M", "F", "X"], required: true },
+  createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model('Patient', PatientSchema);
+module.exports = mongoose.model("Patient", PatientSchema);

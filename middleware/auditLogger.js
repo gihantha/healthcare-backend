@@ -1,22 +1,32 @@
-const AuditLog = require('../models/AuditLog');
+// middleware/auditLogger.js
+const AuditLog = require("../models/AuditLog");
 
-// Middleware to log sensitive actions
 module.exports = function auditLogger(action) {
-  return async function (req, res, next) {
+  return async (req, res, next) => {
     try {
-      const { user } = req; // Assume req.user is set by auth middleware
-      const visitId = req.body.visitId || req.params.visitId;
-      const ip = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+      if (!req.user || !req.user.userId) {
+        return next(); // no user → no audit
+      }
+
+      const visitId = req.body?.visitId || req.params?.visitId || null;
+
+      const ip =
+        req.ip ||
+        req.headers["x-forwarded-for"] ||
+        req.connection?.remoteAddress ||
+        "unknown";
+
       await AuditLog.create({
-        userId: user._id,
-        role: user.role,
+        userId: req.user.userId, 
+        role: req.user.role,
         action,
         visitId,
-        ip
+        ip,
       });
     } catch (err) {
-      // Optionally log error, but do not block request
+      console.error("Audit log error:", err.message);
     }
+
     next();
   };
 };
