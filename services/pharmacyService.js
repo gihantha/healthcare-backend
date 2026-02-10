@@ -17,6 +17,24 @@ async function getPrescription(prescriptionId) {
   };
 }
 
+async function getPrescriptionByQR(visitId) {
+  const prescription = await Prescription.findOne({ visitId });
+  if (!prescription) {
+    throw {
+      code: "PRESCRIPTION_NOT_FOUND",
+      message: "No prescription found for this visit",
+      status: 404,
+    };
+  }
+
+  return {
+    prescriptionId: prescription.prescriptionId,
+    medicines: prescription.medicines,
+    issued: prescription.issued,
+    issuedAt: prescription.issuedAt,
+  };
+}
+
 async function issuePrescription(prescriptionId, user) {
   const prescription = await Prescription.findOne({ prescriptionId });
   if (!prescription)
@@ -29,16 +47,11 @@ async function issuePrescription(prescriptionId, user) {
   prescription.issuedBy = user.userId;
   await prescription.save();
 
-  // Close the visit when medicine is issued
-  const visit = await Visit.findOne({ visitId: prescription.visitId });
-  if (visit && !visit.closed) {
-    visit.closed = true;
-    visit.closedAt = new Date();
-    await visit.save();
-  }
+  // Close the visit
+  await closeVisit(prescription.visitId);
 
   const patient = await Patient.findOne({ patientId: prescription.patientId });
-  if (patient) {
+  if (patient && patient.phone) {
     notify({
       to: patient.phone,
       type: "sms",
@@ -49,8 +62,32 @@ async function issuePrescription(prescriptionId, user) {
   return {
     prescriptionId: prescription.prescriptionId,
     issuedAt: prescription.issuedAt,
-    visitClosed: !!visit,
+    visitClosed: true,
   };
 }
 
-module.exports = { getPrescription, issuePrescription };
+async function issuePrescriptionByQR(visitId, user) {
+  const prescription = await Prescription.findOne({ visitId });
+  if (!prescription)
+    throw { code: "NOT_FOUND", message: "Prescription not found", status: 404 };
+
+  return issuePrescription(prescription.prescriptionId, user);
+}
+
+async function closeVisit(visitId) {
+  const visit = await Visit.findOne({ visitId });
+  if (!visit) return;
+
+  if (!visit.closed) {
+    visit.closed = true;
+    visit.closedAt = new Date();
+    await visit.save();
+  }
+}
+
+module.exports = {
+  getPrescription,
+  issuePrescription,
+  getPrescriptionByQR,
+  issuePrescriptionByQR,
+};

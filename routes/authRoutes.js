@@ -6,5 +6,6 @@ const authOptional = require("../middleware/authOptional");
 
 router.post("/login", authController.login);
 router.post("/create-user", authOptional, authController.createUser);
+router.post("/refresh", authController.refreshToken);
 
 module.exports = router;

@@ -54,7 +54,11 @@
               "INVALID_QR",
               "NO_TOKEN",
               "INVALID_CREDENTIALS",
-              "INVALID_JSON"
+              "INVALID_JSON",
+              "VALIDATION_ERROR",
+              "USER_NOT_FOUND",
+              "PRESCRIPTION_NOT_FOUND",
+              "NO_REFRESH_TOKEN"
             ]
           },
           "message": { "type": "string" }
@@ -117,6 +121,7 @@
       "User": {
         "type": "object",
         "properties": {
+          "_id": { "type": "string" },
           "nic": { "type": "string" },
           "name": { "type": "string" },
           "contact": { "type": "string" },
@@ -131,6 +136,18 @@
               "LAB"
             ]
           },
+          "licenseExpiry": { "type": "string", "format": "date-time" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "nic": { "type": "string" },
+          "name": { "type": "string" },
+          "contact": { "type": "string" },
+          "role": { "type": "string" },
           "licenseExpiry": { "type": "string", "format": "date-time" }
         }
       },
@@ -162,6 +179,16 @@
           "role": { "type": "string" }
         }
       },
+      "RefreshTokenRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token received during login"
+          }
+        },
+        "required": ["refreshToken"]
+      },
       "Patient": {
         "type": "object",
         "properties": {
@@ -184,7 +211,7 @@
           },
           "gender": {
             "type": "string",
-            "enum": ["M", "F"],
+            "enum": ["M", "F", "X"],
             "description": "Gender derived from NIC"
           },
           "createdAt": { "type": "string", "format": "date-time" }
@@ -219,7 +246,9 @@
           "patientId": { "type": "string" },
           "name": { "type": "string" },
           "phone": { "type": "string" },
-          "address": { "type": "string" }
+          "address": { "type": "string" },
+          "dob": { "type": "string", "format": "date" },
+          "gender": { "type": "string" }
         }
       },
       "PatientReissueResponse": {
@@ -250,7 +279,10 @@
           },
           "createdAt": { "type": "string", "format": "date-time" },
           "closed": { "type": "boolean" },
-          "closedAt": { "type": "string", "format": "date-time" }
+          "closedAt": { "type": "string", "format": "date-time" },
+          "patient": {
+            "$ref": "#/components/schemas/PatientBasicInfo"
+          }
         }
       },
       "VisitCreate": {
@@ -273,7 +305,7 @@
           "visitId": { "type": "string" },
           "qrToken": {
             "type": "string",
-            "description": "JWT token for QR access (valid for 1 hour)"
+            "description": "JWT token for QR access (valid for 10 hour)"
           },
           "qrImage": {
             "type": "string",
@@ -284,17 +316,19 @@
       "MedicalRecord": {
         "type": "object",
         "properties": {
+          "_id": { "type": "string" },
           "patientId": { "type": "string" },
           "visitId": { "type": "string" },
           "diagnosis": { "type": "string" },
-          "prescriptions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PrescriptionItem"
+          "notes": { "type": "string" },
+          "createdBy": {
+            "type": "object",
+            "properties": {
+              "_id": { "type": "string" },
+              "name": { "type": "string" },
+              "role": { "type": "string" }
             }
           },
-          "notes": { "type": "string" },
-          "createdBy": { "type": "string" },
           "createdAt": { "type": "string", "format": "date-time" }
         }
       },
@@ -314,6 +348,13 @@
           "notes": { "type": "string" }
         },
         "required": ["diagnosis"]
+      },
+      "MedicalRecordResponse": {
+        "type": "object",
+        "properties": {
+          "medicalRecordId": { "type": "string" },
+          "prescriptionId": { "type": "string" }
+        }
       },
       "Prescription": {
         "type": "object",
@@ -357,6 +398,14 @@
         },
         "required": ["name", "dosage"]
       },
+      "IssuePrescriptionResponse": {
+        "type": "object",
+        "properties": {
+          "prescriptionId": { "type": "string" },
+          "issuedAt": { "type": "string", "format": "date-time" },
+          "visitClosed": { "type": "boolean" }
+        }
+      },
       "AuditLog": {
         "type": "object",
         "properties": {
@@ -371,7 +420,9 @@
               "CREATE_VISIT",
               "ADD_MEDICAL_RECORD",
               "CREATE_USER",
-              "LOGIN"
+              "LOGIN",
+              "REFRESH_TOKEN",
+              "UPDATE_PROFILE"
             ]
           },
           "visitId": { "type": "string" },
@@ -421,6 +472,19 @@
               "total": { "type": "integer" },
               "pages": { "type": "integer" }
             }
+          }
+        }
+      },
+      "UpdateProfileRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full name of the user"
+          },
+          "contact": {
+            "type": "string",
+            "description": "Contact phone number"
           }
         }
       }
@@ -520,6 +584,134 @@
           },
           "403": {
             "description": "Forbidden - ADMIN role required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/auth/refresh": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Refresh access token",
+        "description": "Get new access token using refresh token",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Refresh token required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid refresh token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/user/profile": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get user profile",
+        "description": "Get current logged in user profile information",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Update user profile",
+        "description": "Update current logged in user profile",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid token",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" }
@@ -681,7 +873,7 @@
       "post": {
         "tags": ["Visit Management"],
         "summary": "Create new visit (NURSE/MODERATOR only)",
-        "description": "Create a new hospital visit with QR code for doctor access. QR expires in 1 hour.",
+        "description": "Create a new hospital visit with QR code for doctor access. QR expires in 10 hour.",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -771,6 +963,60 @@
       }
     },
 
+    "/doctor/visit/current": {
+      "get": {
+        "tags": ["Doctor"],
+        "summary": "Get current visit details via QR (DOCTOR only)",
+        "description": "Get current visit information including patient details using QR token.",
+        "security": [{ "bearerAuth": [] }, { "qrAuth": [] }],
+        "parameters": [
+          {
+            "name": "x-qr-token",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "QR JWT token from visit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current visit details retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Visit"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired QR token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - DOCTOR role required or license expired",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "404": {
+            "description": "Visit not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+
     "/doctor/add-record": {
       "post": {
         "tags": ["Doctor"],
@@ -802,7 +1048,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessResponse"
+                  "$ref": "#/components/schemas/MedicalRecordResponse"
                 }
               }
             }
@@ -838,8 +1084,8 @@
     "/pharmacy/prescription/{prescriptionId}": {
       "get": {
         "tags": ["Pharmacy"],
-        "summary": "Get prescription details (PHARMACIST only)",
-        "description": "View prescription details. Pharmacist cannot see diagnosis or medical history.",
+        "summary": "Get prescription details by ID (PHARMACIST only)",
+        "description": "View prescription details using prescription ID. Pharmacist cannot see diagnosis or medical history.",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -885,8 +1131,8 @@
     "/pharmacy/prescription/{prescriptionId}/issue": {
       "post": {
         "tags": ["Pharmacy"],
-        "summary": "Issue prescription (PHARMACIST only)",
-        "description": "Mark prescription as issued. This action closes the visit and expires QR code.",
+        "summary": "Issue prescription by ID (PHARMACIST only)",
+        "description": "Mark prescription as issued using prescription ID. This action closes the visit and expires QR code.",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -905,7 +1151,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessResponse"
+                  "$ref": "#/components/schemas/IssuePrescriptionResponse"
                 }
               }
             }
@@ -928,6 +1174,120 @@
           },
           "403": {
             "description": "Forbidden - PHARMACIST role required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/pharmacy/prescription/qr": {
+      "get": {
+        "tags": ["Pharmacy"],
+        "summary": "Get prescription details via QR (PHARMACIST only)",
+        "description": "View prescription details by scanning QR code. Returns prescription for current visit.",
+        "security": [{ "bearerAuth": [] }, { "qrAuth": [] }],
+        "parameters": [
+          {
+            "name": "x-qr-token",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "QR JWT token from visit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Prescription details retrieved",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Prescription" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired QR token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - PHARMACIST role required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "404": {
+            "description": "No prescription found for this visit",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/pharmacy/prescription/qr/issue": {
+      "post": {
+        "tags": ["Pharmacy"],
+        "summary": "Issue prescription via QR (PHARMACIST only)",
+        "description": "Mark prescription as issued by scanning QR code. This action closes the visit and expires QR code.",
+        "security": [{ "bearerAuth": [] }, { "qrAuth": [] }],
+        "parameters": [
+          {
+            "name": "x-qr-token",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "QR JWT token from visit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Prescription issued successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuePrescriptionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Prescription already issued",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired QR token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - PHARMACIST role required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "404": {
+            "description": "No prescription found for this visit",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" }
@@ -1004,6 +1364,49 @@
       }
     },
 
+    "/setup/check": {
+      "get": {
+        "tags": ["System"],
+        "summary": "Check system setup status",
+        "description": "Check if system is properly set up and see existing users",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Setup status retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "database": { "type": "string" },
+                    "userCount": { "type": "integer" },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "nic": { "type": "string" },
+                          "name": { "type": "string" },
+                          "role": { "type": "string" },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    },
+                    "isFirstTimeSetup": { "type": "boolean" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
     "/example/admin-only": {
       "get": {
         "tags": ["Example"],
@@ -1032,5 +1435,43 @@
         }
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User authentication and authorization endpoints"
+    },
+    {
+      "name": "User",
+      "description": "User profile management endpoints"
+    },
+    {
+      "name": "Patient Management",
+      "description": "Patient registration and management endpoints"
+    },
+    {
+      "name": "Visit Management",
+      "description": "Hospital visit management endpoints"
+    },
+    {
+      "name": "Doctor",
+      "description": "Doctor-specific endpoints for patient care"
+    },
+    {
+      "name": "Pharmacy",
+      "description": "Pharmacy workflow endpoints"
+    },
+    {
+      "name": "Audit",
+      "description": "System audit logging endpoints"
+    },
+    {
+      "name": "System",
+      "description": "System administration and setup endpoints"
+    },
+    {
+      "name": "Example",
+      "description": "Example endpoints for testing"
+    }
+  ]
 }

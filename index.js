@@ -1,3 +1,4 @@
+//index.js
 const express = require("express");
 const mongoose = require("mongoose");
 const swaggerUi = require("swagger-ui-express");
@@ -23,7 +24,7 @@ app.use((err, req, res, next) => {
 });
 
 // Connect to MongoDB only if not in test environment
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== "test") {
   mongoose
     .connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB connected"))
@@ -38,6 +39,7 @@ app.use("/doctor", require("./routes/doctorRoutes"));
 app.use("/pharmacy", require("./routes/pharmacyRoutes"));
 app.use("/audit", require("./routes/auditRoutes"));
 app.use("/example", require("./routes/exampleRoutes"));
+app.use("/user", require("./routes/userRoutes"));
 
 // Swagger docs
 const swaggerDocument = JSON.parse(
@@ -61,33 +63,34 @@ app.use((err, req, res, next) => {
 });
 
 // Start server only if not in test environment
-if (process.env.NODE_ENV !== 'test' && require.main === module) {
+if (process.env.NODE_ENV !== "test" && require.main === module) {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
 // Add this route before other routes
-app.get('/setup/check', async (req, res) => {
+app.get("/setup/check", async (req, res) => {
   try {
-    const User = require('./models/User');
+    const User = require("./models/User");
     const userCount = await User.countDocuments();
-    const users = await User.find().select('nic name role createdAt').lean();
-    
+    const users = await User.find().select("nic name role createdAt").lean();
+
     res.json({
       success: true,
-      database: 'connected',
+      database: "connected",
       userCount,
       users,
       isFirstTimeSetup: userCount === 0,
-      message: userCount === 0 
-        ? 'No users found. Use POST /auth/create-user with admin data to create first user.' 
-        : 'System already has users.'
+      message:
+        userCount === 0
+          ? "No users found. Use POST /auth/create-user with admin data to create first user."
+          : "System already has users.",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message,
-      database: 'error'
+      database: "error",
     });
   }
 });

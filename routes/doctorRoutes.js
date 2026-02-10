@@ -1,4 +1,4 @@
-//routes/doctorRoutes.js
+// routes/doctorRoutes.js
 const express = require("express");
 const router = express.Router();
 const doctorService = require("../services/doctorService");
@@ -17,7 +17,7 @@ router.get(
       const records = await doctorService.getPatientHistory(
         req.qrPayload.patientId
       );
-      res.json(records);
+      res.json({ success: true, data: records });
     } catch (err) {
       next(err);
     }
@@ -42,7 +42,25 @@ router.post(
         notes,
         createdBy: req.user.userId,
       });
-      res.json(result);
+      res.json({ success: true, data: result });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// Get current visit details
+router.get(
+  "/visit/current",
+  authenticateToken,
+  roleGuard(["DOCTOR"]),
+  qrValidator,
+  async (req, res, next) => {
+    try {
+      const visitDetails = await doctorService.getCurrentVisitDetails(
+        req.qrPayload.visitId
+      );
+      res.json({ success: true, data: visitDetails });
     } catch (err) {
       next(err);
     }

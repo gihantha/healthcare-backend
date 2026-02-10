@@ -7,14 +7,12 @@ module.exports = async function generateVisitQR({
   visitId,
   expiresIn = "10h",
 }) {
-  const payload = {
-    patientId,
-    visitId,
-    exp:
-      Math.floor(Date.now() / 1000) +
-      (typeof expiresIn === "string" ? 36000 : expiresIn),
-  };
-  const token = jwt.sign(payload, process.env.QR_SECRET || "qr_secret");
+  const payload = { patientId, visitId };
+
+  const token = jwt.sign(payload, process.env.QR_SECRET || "qr_secret", {
+    expiresIn,
+  });
+
   const qrData = await QRCode.toDataURL(token);
   return { token, qrData };
 };
@@ -24,12 +22,11 @@ module.exports.validateQRToken = function (qrToken) {
   try {
     const payload = jwt.verify(qrToken, process.env.QR_SECRET || "qr_secret");
 
-    if (payload.exp && Date.now() >= payload.exp * 1000) {
-      return { valid: false, error: "QR token expired" };
-    }
-
     return { valid: true, payload };
   } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return { valid: false, error: "QR token expired" };
+    }
     return { valid: false, error: "Invalid QR token" };
   }
 };

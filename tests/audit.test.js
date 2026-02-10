@@ -1,12 +1,12 @@
-const request = require('supertest');
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const request = require("supertest");
+const express = require("express");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const app = express();
 app.use(express.json());
 
-process.env.JWT_SECRET = 'test-secret-key';
+process.env.JWT_SECRET = "test-secret-key";
 
 // In-memory storage
 const users = [];
@@ -14,7 +14,9 @@ const auditLogs = [];
 
 // Helper functions
 const createToken = (userId, role) => {
-  return jwt.sign({ userId, role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  return jwt.sign({ userId, role }, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
 };
 
 // Middleware
@@ -44,60 +46,71 @@ const roleGuard = (...allowedRoles) => {
 // Setup before tests
 beforeAll(async () => {
   // Create admin user
-  const adminPass = await bcrypt.hash('admin123', 10);
+  const adminPass = await bcrypt.hash("admin123", 10);
   users.push({
     id: 1,
-    nic: '199011111111',
+    nic: "199011111111",
     password: adminPass,
-    name: 'Admin User',
-    role: 'ADMIN'
+    name: "Admin User",
+    role: "ADMIN",
   });
 
   // Create some audit logs
   auditLogs.push(
     {
-      logId: 'AUDIT-001',
+      logId: "AUDIT-001",
       userId: 1,
-      role: 'ADMIN',
-      action: 'LOGIN',
-      timestamp: new Date('2024-01-01'),
-      ip: '127.0.0.1'
+      role: "ADMIN",
+      action: "LOGIN",
+      timestamp: new Date("2024-01-01"),
+      ip: "127.0.0.1",
     },
     {
-      logId: 'AUDIT-002',
+      logId: "AUDIT-002",
       userId: 1,
-      role: 'ADMIN',
-      action: 'CREATE_USER',
-      timestamp: new Date('2024-01-02'),
-      ip: '127.0.0.1'
+      role: "ADMIN",
+      action: "CREATE_USER",
+      timestamp: new Date("2024-01-02"),
+      ip: "127.0.0.1",
     }
   );
 });
 
 // Get audit logs
-app.get('/audit/logs', authenticate, roleGuard('ADMIN'), (req, res) => {
+app.get("/audit/logs", authenticate, roleGuard("ADMIN"), (req, res) => {
   try {
-    const { page = 1, limit = 50, startDate, endDate, role, action } = req.query;
-    
+    const {
+      page = 1,
+      limit = 50,
+      startDate,
+      endDate,
+      role,
+      action,
+    } = req.query;
+
     let filteredLogs = [...auditLogs];
 
     // Apply filters
     if (startDate) {
       const start = new Date(startDate);
-      filteredLogs = filteredLogs.filter(log => new Date(log.timestamp) >= start);
+      filteredLogs = filteredLogs.filter(
+        (log) => new Date(log.timestamp) >= start
+      );
     }
-    
+
     if (endDate) {
       const end = new Date(endDate);
-      filteredLogs = filteredLogs.filter(log => new Date(log.timestamp) <= end);
+      filteredLogs = filteredLogs.filter(
+        (log) => new Date(log.timestamp) <= end
+      );
     }
-    
+
     if (role) {
-      filteredLogs = filteredLogs.filter(log => log.role === role);
+      filteredLogs = filteredLogs.filter((log) => log.role === role);
     }
-    
+
     if (action) {
-      filteredLogs = filteredLogs.filter(log => log.action === action);
+      filteredLogs = filteredLogs.filter((log) => log.action === action);
     }
 
     // Pagination
@@ -111,8 +124,8 @@ app.get('/audit/logs', authenticate, roleGuard('ADMIN'), (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total: filteredLogs.length,
-        pages: Math.ceil(filteredLogs.length / limit)
-      }
+        pages: Math.ceil(filteredLogs.length / limit),
+      },
     });
   } catch (err) {
     console.error(err);
@@ -120,47 +133,49 @@ app.get('/audit/logs', authenticate, roleGuard('ADMIN'), (req, res) => {
   }
 });
 
-describe('Audit API Tests', () => {
+describe("Audit API Tests", () => {
   let adminToken;
 
   beforeEach(() => {
-    adminToken = createToken(1, 'ADMIN');
+    adminToken = createToken(1, "ADMIN");
   });
 
-  it('should get audit logs as ADMIN', async () => {
+  it("should get audit logs as ADMIN", async () => {
     const response = await request(app)
-      .get('/audit/logs')
-      .set('Authorization', `Bearer ${adminToken}`);
+      .get("/audit/logs")
+      .set("Authorization", `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body.logs)).toBe(true);
     expect(response.body.pagination).toBeDefined();
   });
 
-  it('should filter logs by date range', async () => {
+  it("should filter logs by date range", async () => {
     const response = await request(app)
-      .get('/audit/logs?startDate=2024-01-01&endDate=2024-01-02')
-      .set('Authorization', `Bearer ${adminToken}`);
+      .get("/audit/logs?startDate=2024-01-01&endDate=2024-01-02")
+      .set("Authorization", `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body.logs.length).toBeGreaterThan(0);
   });
 
-  it('should filter logs by action', async () => {
+  it("should filter logs by action", async () => {
     const response = await request(app)
-      .get('/audit/logs?action=LOGIN')
-      .set('Authorization', `Bearer ${adminToken}`);
+      .get("/audit/logs?action=LOGIN")
+      .set("Authorization", `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
-    expect(response.body.logs.every(log => log.action === 'LOGIN')).toBe(true);
+    expect(response.body.logs.every((log) => log.action === "LOGIN")).toBe(
+      true
+    );
   });
 
-  it('should reject without ADMIN role', async () => {
-    const nurseToken = createToken(2, 'NURSE');
-    
+  it("should reject without ADMIN role", async () => {
+    const nurseToken = createToken(2, "NURSE");
+
     const response = await request(app)
-      .get('/audit/logs')
-      .set('Authorization', `Bearer ${nurseToken}`);
+      .get("/audit/logs")
+      .set("Authorization", `Bearer ${nurseToken}`);
 
     expect(response.status).toBe(403);
   });
