@@ -2,9 +2,11 @@
   "name": "project",
   "version": "1.0.0",
   "main": "index.js",
-   "scripts": {
+  "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+
+
     "test": "cross-env NODE_ENV=test jest tests/ --testPathPattern=\\.test\\.js$ --detectOpenHandles --forceExit",
     "test:report": "node tests/test-report.js",
     "test:coverage": "cross-env NODE_ENV=test jest --coverage --testPathPattern=tests/.*\\.test\\.js$",
@@ -18,8 +20,9 @@
     "test:visit": "cross-env NODE_ENV=test jest tests/visit.test.js --detectOpenHandles --forceExit",
     "test:audit": "cross-env NODE_ENV=test jest tests/audit.test.js --detectOpenHandles --forceExit",
     "test:integration": "cross-env NODE_ENV=test jest tests/integration.test.js --detectOpenHandles --forceExit",
-
     "setup": "node tests/setup.js",
+
+    "mock": "prism mock swagger.json --port 3001",
     "check-setup": "node -e \"const mongoose = require('mongoose'); mongoose.connect(process.env.MONGO_URI).then(() => { console.log('Connected to MongoDB'); return mongoose.connection.db.collection('users').countDocuments(); }).then(count => { console.log('Total users:', count); mongoose.disconnect(); }).catch(err => console.error('Error:', err));\""
   },
   "devDependencies": {
@@ -40,6 +43,9 @@
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.5",
     "nodemailer": "^7.0.12",

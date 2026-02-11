@@ -3,6 +3,7 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 
+
 function createTokens(user) {
   const payload = {
     userId: user._id,
@@ -14,8 +15,8 @@ function createTokens(user) {
     payload.licenseExpiry = user.licenseExpiry;
   }
 
-  const accessToken = jwt.sign(payload, process.env.JWT_SECRET || 'mysecretkey', { expiresIn: '45m' });
-  const refreshToken = jwt.sign(payload, process.env.JWT_SECRET || 'mysecretkey', { expiresIn: '7d' });
+  const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '8h' });
+  const refreshToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
 
   return { accessToken, refreshToken, role: user.role, name: user.name };
 }

@@ -15,7 +15,7 @@ module.exports = function authenticateToken(req, res, next) {
       .json({ code: "NO_TOKEN", message: "No token provided" });
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET || "jwt_secret");
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
     req.user = payload; // attach user to request
     next();
   } catch {

@@ -61,7 +61,9 @@
               "NO_REFRESH_TOKEN"
             ]
           },
-          "message": { "type": "string" }
+          "message": {
+            "type": "string"
+          }
         },
         "example": {
           "code": "INVALID_TOKEN",
@@ -71,9 +73,15 @@
       "SuccessResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean" },
-          "message": { "type": "string" },
-          "data": { "type": "object" }
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
         }
       },
       "UserCreate": {
@@ -94,14 +102,7 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "ADMIN",
-              "MODERATOR",
-              "DOCTOR",
-              "NURSE",
-              "PHARMACIST",
-              "LAB"
-            ],
+            "enum": ["ADMIN", "MODERATOR", "DOCTOR", "NURSE", "PHARMACIST", "LAB"],
             "description": "User role in the system"
           },
           "licenseExpiry": {
@@ -121,34 +122,55 @@
       "User": {
         "type": "object",
         "properties": {
-          "_id": { "type": "string" },
-          "nic": { "type": "string" },
-          "name": { "type": "string" },
-          "contact": { "type": "string" },
+          "_id": {
+            "type": "string"
+          },
+          "nic": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "string"
+          },
           "role": {
             "type": "string",
-            "enum": [
-              "ADMIN",
-              "MODERATOR",
-              "DOCTOR",
-              "NURSE",
-              "PHARMACIST",
-              "LAB"
-            ]
+            "enum": ["ADMIN", "MODERATOR", "DOCTOR", "NURSE", "PHARMACIST", "LAB"]
           },
-          "licenseExpiry": { "type": "string", "format": "date-time" },
-          "createdAt": { "type": "string", "format": "date-time" },
-          "updatedAt": { "type": "string", "format": "date-time" }
+          "licenseExpiry": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "UserProfile": {
         "type": "object",
         "properties": {
-          "nic": { "type": "string" },
-          "name": { "type": "string" },
-          "contact": { "type": "string" },
-          "role": { "type": "string" },
-          "licenseExpiry": { "type": "string", "format": "date-time" }
+          "nic": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "licenseExpiry": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "LoginRequest": {
@@ -176,7 +198,9 @@
             "type": "string",
             "description": "JWT refresh token (valid for 7 days)"
           },
-          "role": { "type": "string" }
+          "role": {
+            "type": "string"
+          }
         }
       },
       "RefreshTokenRequest": {
@@ -197,9 +221,15 @@
             "example": "P-123e4567-e89b-12d3-a456-426614174000",
             "description": "Immutable unique patient identifier"
           },
-          "name": { "type": "string" },
-          "address": { "type": "string" },
-          "phone": { "type": "string" },
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
           "nic": {
             "type": "string",
             "description": "National Identity Card number (unique)"
@@ -214,7 +244,10 @@
             "enum": ["M", "F", "X"],
             "description": "Gender derived from NIC"
           },
-          "createdAt": { "type": "string", "format": "date-time" }
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "PatientCreate": {
@@ -243,21 +276,43 @@
       "PatientBasicInfo": {
         "type": "object",
         "properties": {
-          "patientId": { "type": "string" },
-          "name": { "type": "string" },
-          "phone": { "type": "string" },
-          "address": { "type": "string" },
-          "dob": { "type": "string", "format": "date" },
-          "gender": { "type": "string" }
+          "patientId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string",
+            "format": "date"
+          },
+          "gender": {
+            "type": "string"
+          }
         }
       },
       "PatientReissueResponse": {
         "type": "object",
         "properties": {
-          "patientId": { "type": "string" },
-          "name": { "type": "string" },
-          "gender": { "type": "string" },
-          "dateOfBirth": { "type": "string", "format": "date" }
+          "patientId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          }
         }
       },
       "Visit": {
@@ -277,9 +332,17 @@
             "enum": ["OPD", "SPECIAL"],
             "description": "OPD or special unit"
           },
-          "createdAt": { "type": "string", "format": "date-time" },
-          "closed": { "type": "boolean" },
-          "closedAt": { "type": "string", "format": "date-time" },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closed": {
+            "type": "boolean"
+          },
+          "closedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
           "patient": {
             "$ref": "#/components/schemas/PatientBasicInfo"
           }
@@ -302,7 +365,9 @@
       "VisitResponse": {
         "type": "object",
         "properties": {
-          "visitId": { "type": "string" },
+          "visitId": {
+            "type": "string"
+          },
           "qrToken": {
             "type": "string",
             "description": "JWT token for QR access (valid for 10 hour)"
@@ -316,20 +381,39 @@
       "MedicalRecord": {
         "type": "object",
         "properties": {
-          "_id": { "type": "string" },
-          "patientId": { "type": "string" },
-          "visitId": { "type": "string" },
-          "diagnosis": { "type": "string" },
-          "notes": { "type": "string" },
+          "_id": {
+            "type": "string"
+          },
+          "patientId": {
+            "type": "string"
+          },
+          "visitId": {
+            "type": "string"
+          },
+          "diagnosis": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
           "createdBy": {
             "type": "object",
             "properties": {
-              "_id": { "type": "string" },
-              "name": { "type": "string" },
-              "role": { "type": "string" }
+              "_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              }
             }
           },
-          "createdAt": { "type": "string", "format": "date-time" }
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "MedicalRecordCreate": {
@@ -345,15 +429,21 @@
               "$ref": "#/components/schemas/PrescriptionCreate"
             }
           },
-          "notes": { "type": "string" }
+          "notes": {
+            "type": "string"
+          }
         },
         "required": ["diagnosis"]
       },
       "MedicalRecordResponse": {
         "type": "object",
         "properties": {
-          "medicalRecordId": { "type": "string" },
-          "prescriptionId": { "type": "string" }
+          "medicalRecordId": {
+            "type": "string"
+          },
+          "prescriptionId": {
+            "type": "string"
+          }
         }
       },
       "Prescription": {
@@ -363,54 +453,99 @@
             "type": "string",
             "example": "RX-123e4567-e89b-12d3-a456-426614174000"
           },
-          "visitId": { "type": "string" },
-          "patientId": { "type": "string" },
+          "visitId": {
+            "type": "string"
+          },
+          "patientId": {
+            "type": "string"
+          },
           "medicines": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PrescriptionItem"
             }
           },
-          "issued": { "type": "boolean" },
-          "issuedAt": { "type": "string", "format": "date-time" },
-          "issuedBy": { "type": "string" },
-          "createdAt": { "type": "string", "format": "date-time" }
+          "issued": {
+            "type": "boolean"
+          },
+          "issuedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "issuedBy": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "PrescriptionItem": {
         "type": "object",
         "properties": {
-          "name": { "type": "string" },
-          "dosage": { "type": "string" },
-          "frequency": { "type": "string" },
-          "duration": { "type": "string" },
-          "notes": { "type": "string" }
+          "name": {
+            "type": "string"
+          },
+          "dosage": {
+            "type": "string"
+          },
+          "frequency": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
         }
       },
       "PrescriptionCreate": {
         "type": "object",
         "properties": {
-          "name": { "type": "string" },
-          "dosage": { "type": "string" },
-          "frequency": { "type": "string" },
-          "duration": { "type": "string" },
-          "notes": { "type": "string" }
+          "name": {
+            "type": "string"
+          },
+          "dosage": {
+            "type": "string"
+          },
+          "frequency": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
         },
         "required": ["name", "dosage"]
       },
       "IssuePrescriptionResponse": {
         "type": "object",
         "properties": {
-          "prescriptionId": { "type": "string" },
-          "issuedAt": { "type": "string", "format": "date-time" },
-          "visitClosed": { "type": "boolean" }
+          "prescriptionId": {
+            "type": "string"
+          },
+          "issuedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "visitClosed": {
+            "type": "boolean"
+          }
         }
       },
       "AuditLog": {
         "type": "object",
         "properties": {
-          "userId": { "type": "string" },
-          "role": { "type": "string" },
+          "userId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
           "action": {
             "type": "string",
             "enum": [
@@ -425,10 +560,19 @@
               "UPDATE_PROFILE"
             ]
           },
-          "visitId": { "type": "string" },
-          "timestamp": { "type": "string", "format": "date-time" },
-          "ip": { "type": "string" },
-          "details": { "type": "object" }
+          "visitId": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          }
         }
       },
       "AuditLogQuery": {
@@ -453,8 +597,12 @@
             "type": "string",
             "format": "date-time"
           },
-          "role": { "type": "string" },
-          "action": { "type": "string" }
+          "role": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          }
         }
       },
       "AuditLogResponse": {
@@ -462,15 +610,25 @@
         "properties": {
           "logs": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/AuditLog" }
+            "items": {
+              "$ref": "#/components/schemas/AuditLog"
+            }
           },
           "pagination": {
             "type": "object",
             "properties": {
-              "page": { "type": "integer" },
-              "limit": { "type": "integer" },
-              "total": { "type": "integer" },
-              "pages": { "type": "integer" }
+              "page": {
+                "type": "integer"
+              },
+              "limit": {
+                "type": "integer"
+              },
+              "total": {
+                "type": "integer"
+              },
+              "pages": {
+                "type": "integer"
+              }
             }
           }
         }
@@ -490,7 +648,11 @@
       }
     }
   },
-  "security": [{ "bearerAuth": [] }],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
   "paths": {
     "/auth/login": {
       "post": {
@@ -498,6 +660,18 @@
         "tags": ["Authentication"],
         "summary": "User login with NIC and password",
         "description": "Authenticate user and return JWT tokens. For DOCTOR and NURSE roles, checks license expiry.",
+        "x-code-samples": [
+          {
+            "lang": "JavaScript",
+            "label": "Axios Example",
+            "source": "const login = async (nic, password) => {\n  try {\n    const response = await axios.post('/auth/login', {\n      nic: nic,\n      password: password\n    });\n    \n    localStorage.setItem('accessToken', response.data.accessToken);\n    localStorage.setItem('refreshToken', response.data.refreshToken);\n    localStorage.setItem('userRole', response.data.role);\n    \n    axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;\n    \n    return response.data;\n  } catch (error) {\n    console.error('Login error:', error.response?.data);\n    throw error;\n  }\n};"
+          },
+          {
+            "lang": "React",
+            "label": "React Hook Example",
+            "source": "export const useAuth = () => {\n  const [loading, setLoading] = useState(false);\n  const [error, setError] = useState(null);\n  \n  const login = async (nic, password) => {\n    setLoading(true);\n    setError(null);\n    \n    try {\n      const response = await axios.post('/auth/login', { nic, password });\n      \n      localStorage.setItem('accessToken', response.data.accessToken);\n      localStorage.setItem('userRole', response.data.role);\n      \n      return response.data;\n    } catch (err) {\n      const errorMsg = err.response?.data?.message || 'Login failed';\n      setError(errorMsg);\n      throw err;\n    } finally {\n      setLoading(false);\n    }\n  };\n  \n  return { login, loading, error };\n};"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -523,7 +697,9 @@
             "description": "Missing credentials",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -531,7 +707,9 @@
             "description": "Invalid credentials",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -539,20 +717,32 @@
             "description": "License expired (for DOCTOR/NURSE)",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/auth/create-user": {
       "post": {
         "tags": ["Authentication"],
         "summary": "Create new user (ADMIN only)",
         "description": "Create new system user. First user must be ADMIN. Subsequent users require ADMIN role.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JavaScript",
+            "label": "Create User with Admin Token",
+            "source": "const createUser = async (userData) => {\n  const token = localStorage.getItem('accessToken');\n  \n  try {\n    const response = await axios.post('/auth/create-user', userData, {\n      headers: {\n        'Authorization': `Bearer ${token}`,\n        'Content-Type': 'application/json'\n      }\n    });\n    \n    return response.data;\n  } catch (error) {\n    if (error.response?.data?.code === 'FORBIDDEN') {\n      alert('Only administrators can create users');\n    }\n    throw error;\n  }\n};"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -578,7 +768,9 @@
             "description": "Invalid request or NIC exists",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -586,20 +778,28 @@
             "description": "Forbidden - ADMIN role required",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/auth/refresh": {
       "post": {
         "tags": ["Authentication"],
         "summary": "Refresh access token",
         "description": "Get new access token using refresh token",
         "security": [],
+        "x-code-samples": [
+          {
+            "lang": "JavaScript",
+            "label": "Token Refresh Interceptor",
+            "source": "axios.interceptors.response.use(\n  response => response,\n  async error => {\n    const originalRequest = error.config;\n    \n    if (error.response?.status === 401 && !originalRequest._retry) {\n      originalRequest._retry = true;\n      \n      try {\n        const refreshToken = localStorage.getItem('refreshToken');\n        const response = await axios.post('/auth/refresh', {\n          refreshToken: refreshToken\n        });\n        \n        localStorage.setItem('accessToken', response.data.accessToken);\n        localStorage.setItem('refreshToken', response.data.refreshToken);\n        \n        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;\n        originalRequest.headers['Authorization'] = `Bearer ${response.data.accessToken}`;\n        \n        return axios(originalRequest);\n      } catch (refreshError) {\n        localStorage.clear();\n        window.location.href = '/login';\n        return Promise.reject(refreshError);\n      }\n    }\n    \n    return Promise.reject(error);\n  }\n);"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -625,7 +825,9 @@
             "description": "Refresh token required",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -633,20 +835,25 @@
             "description": "Invalid refresh token",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/user/profile": {
       "get": {
         "tags": ["User"],
         "summary": "Get user profile",
         "description": "Get current logged in user profile information",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Profile retrieved successfully",
@@ -662,7 +869,9 @@
             "description": "Invalid token",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -670,7 +879,9 @@
             "description": "User not found",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
@@ -680,7 +891,11 @@
         "tags": ["User"],
         "summary": "Update user profile",
         "description": "Update current logged in user profile",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -706,7 +921,9 @@
             "description": "Invalid request data",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -714,20 +931,32 @@
             "description": "Invalid token",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/patient/register": {
       "post": {
         "tags": ["Patient Management"],
         "summary": "Register new patient (NURSE/MODERATOR only)",
         "description": "Register patient with NIC. Date of birth and gender are derived from NIC. Patient ID is generated automatically.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "React",
+            "label": "Patient Registration Form",
+            "source": "export const PatientRegistrationForm = () => {\n  const [formData, setFormData] = useState({\n    name: '',\n    nic: '',\n    address: '',\n    phone: ''\n  });\n  const [loading, setLoading] = useState(false);\n  const [error, setError] = useState(null);\n  const [success, setSuccess] = useState(false);\n  \n  const handleSubmit = async (e) => {\n    e.preventDefault();\n    setLoading(true);\n    setError(null);\n    \n    try {\n      const token = localStorage.getItem('accessToken');\n      const response = await axios.post('/patient/register', formData, {\n        headers: {\n          'Authorization': `Bearer ${token}`\n        }\n      });\n      \n      setSuccess(true);\n      alert(`Patient registered! Patient ID: ${response.data.data.patientId}`);\n      setFormData({ name: '', nic: '', address: '', phone: '' });\n    } catch (err) {\n      if (err.response?.data?.code === 'NIC_EXISTS') {\n        setError('This NIC is already registered');\n      } else if (err.response?.data?.code === 'VALIDATION_ERROR') {\n        setError('Invalid NIC format');\n      } else {\n        setError(err.response?.data?.message || 'Registration failed');\n      }\n    } finally {\n      setLoading(false);\n    }\n  };\n  \n  return (\n    <form onSubmit={handleSubmit}>\n      <input\n        type=\"text\"\n        placeholder=\"Full Name\"\n        value={formData.name}\n        onChange={(e) => setFormData({...formData, name: e.target.value})}\n        required\n      />\n      <input\n        type=\"text\"\n        placeholder=\"NIC\"\n        value={formData.nic}\n        onChange={(e) => setFormData({...formData, nic: e.target.value})}\n        required\n      />\n      <button type=\"submit\" disabled={loading}>\n        {loading ? 'Registering...' : 'Register Patient'}\n      </button>\n      {error && <div>{error}</div>}\n      {success && <div>Registration successful!</div>}\n    </form>\n  );\n};"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -753,7 +982,9 @@
             "description": "NIC exists or invalid NIC format",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -761,26 +992,40 @@
             "description": "Forbidden - NURSE or MODERATOR role required",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/patient/search": {
       "get": {
         "tags": ["Patient Management"],
         "summary": "Search patient by NIC (NURSE/MODERATOR/DOCTOR)",
         "description": "Search for patient using NIC number. Returns basic patient information only.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "React",
+            "label": "Patient Search with Debounce",
+            "source": "export const usePatientSearch = () => {\n  const [searchTerm, setSearchTerm] = useState('');\n  const [results, setResults] = useState(null);\n  const [loading, setLoading] = useState(false);\n  const [error, setError] = useState(null);\n  \n  useEffect(() => {\n    const searchPatient = async () => {\n      if (!searchTerm.trim()) {\n        setResults(null);\n        return;\n      }\n      \n      setLoading(true);\n      setError(null);\n      \n      try {\n        const token = localStorage.getItem('accessToken');\n        const response = await axios.get(`/patient/search?nic=${encodeURIComponent(searchTerm)}`, {\n          headers: {\n            'Authorization': `Bearer ${token}`\n          }\n        });\n        \n        setResults(response.data);\n      } catch (err) {\n        if (err.response?.status === 404) {\n          setError('Patient not found');\n        } else {\n          setError(err.response?.data?.message || 'Search failed');\n        }\n        setResults(null);\n      } finally {\n        setLoading(false);\n      }\n    };\n    \n    const timeoutId = setTimeout(searchPatient, 500);\n    return () => clearTimeout(timeoutId);\n  }, [searchTerm]);\n  \n  return { searchTerm, setSearchTerm, results, loading, error };\n};"
+          }
+        ],
         "parameters": [
           {
             "name": "nic",
             "in": "query",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Patient NIC number"
           }
         ],
@@ -799,7 +1044,9 @@
             "description": "Patient not found",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -807,20 +1054,25 @@
             "description": "Forbidden",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/patient/reissue-id": {
       "post": {
         "tags": ["Patient Management"],
         "summary": "Reissue patient ID card (MODERATOR only)",
         "description": "Reissue patient ID card. Requires MODERATOR role. Action is logged in audit trail.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -853,7 +1105,9 @@
             "description": "Patient not found",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -861,20 +1115,32 @@
             "description": "Forbidden - MODERATOR role required",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/visit/create": {
       "post": {
         "tags": ["Visit Management"],
         "summary": "Create new visit (NURSE/MODERATOR only)",
         "description": "Create a new hospital visit with QR code for doctor access. QR expires in 10 hour.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "React",
+            "label": "Create Visit with QR Display",
+            "source": "export const CreateVisitForm = () => {\n  const [patientId, setPatientId] = useState('');\n  const [unit, setUnit] = useState('OPD');\n  const [loading, setLoading] = useState(false);\n  const [qrData, setQrData] = useState(null);\n  \n  const createVisit = async () => {\n    if (!patientId) return;\n    \n    setLoading(true);\n    \n    try {\n      const token = localStorage.getItem('accessToken');\n      const response = await axios.post('/visit/create', {\n        patientId,\n        unit\n      }, {\n        headers: {\n          'Authorization': `Bearer ${token}`\n        }\n      });\n      \n      setQrData({\n        token: response.data.qrToken,\n        image: response.data.qrImage,\n        visitId: response.data.visitId\n      });\n      \n      setPatientId('');\n    } catch (err) {\n      alert(err.response?.data?.message || 'Failed to create visit');\n    } finally {\n      setLoading(false);\n    }\n  };\n  \n  return (\n    <div>\n      <div>\n        <input\n          type=\"text\"\n          placeholder=\"Patient ID (P-...)\"\n          value={patientId}\n          onChange={(e) => setPatientId(e.target.value)}\n        />\n        <select value={unit} onChange={(e) => setUnit(e.target.value)}>\n          <option value=\"OPD\">OPD</option>\n          <option value=\"SPECIAL\">Special Unit</option>\n        </select>\n        <button onClick={createVisit} disabled={loading || !patientId}>\n          {loading ? 'Creating...' : 'Create Visit'}\n        </button>\n      </div>\n      \n      {qrData && (\n        <div>\n          <h3>Visit Created: {qrData.visitId}</h3>\n          <p>Scan this QR code:</p>\n          <QRCode value={qrData.token} size={200} />\n          <p>QR expires in 10 hours</p>\n          <button onClick={() => navigator.clipboard.writeText(qrData.token)}>\n            Copy QR Token\n          </button>\n        </div>\n      )}\n    </div>\n  );\n};"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -900,7 +1166,9 @@
             "description": "Patient not found",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -908,26 +1176,43 @@
             "description": "Forbidden - NURSE or MODERATOR role required",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/doctor/history": {
       "get": {
         "tags": ["Doctor"],
         "summary": "Get patient medical history via QR (DOCTOR only)",
         "description": "Access patient medical history using QR token. Doctor must have valid license.",
-        "security": [{ "bearerAuth": [] }, { "qrAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "qrAuth": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JavaScript",
+            "label": "Doctor QR Scanner Integration",
+            "source": "export const DoctorQRScanner = () => {\n  const [scanning, setScanning] = useState(false);\n  const [medicalHistory, setMedicalHistory] = useState([]);\n  const [error, setError] = useState(null);\n  \n  const startScanner = async () => {\n    const videoElement = document.getElementById('qr-video');\n    if (!videoElement) return;\n    \n    const scanner = new QrScanner(\n      videoElement,\n      async (result) => {\n        setScanning(false);\n        scanner.stop();\n        \n        try {\n          const accessToken = localStorage.getItem('accessToken');\n          \n          const response = await axios.get('/doctor/history', {\n            headers: {\n              'Authorization': `Bearer ${accessToken}`,\n              'x-qr-token': result.data\n            }\n          });\n          \n          setMedicalHistory(response.data);\n          setError(null);\n        } catch (err) {\n          if (err.response?.data?.code === 'QR_EXPIRED') {\n            setError('QR code has expired');\n          } else if (err.response?.data?.code === 'LICENSE_EXPIRED') {\n            setError('Your medical license has expired');\n          } else {\n            setError(err.response?.data?.message || 'Failed to load medical history');\n          }\n        }\n      },\n      {\n        highlightScanRegion: true,\n        highlightCodeOutline: true\n      }\n    );\n    \n    await scanner.start();\n    setScanning(true);\n  };\n  \n  return {\n    startScanner,\n    scanning,\n    medicalHistory,\n    error\n  };\n};"
+          }
+        ],
         "parameters": [
           {
             "name": "x-qr-token",
             "in": "header",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "QR JWT token from visit"
           }
         ],
@@ -938,7 +1223,9 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/MedicalRecord" }
+                  "items": {
+                    "$ref": "#/components/schemas/MedicalRecord"
+                  }
                 }
               }
             }
@@ -947,7 +1234,9 @@
             "description": "Invalid or expired QR token",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -955,26 +1244,36 @@
             "description": "Forbidden - DOCTOR role required or license expired",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/doctor/visit/current": {
       "get": {
         "tags": ["Doctor"],
         "summary": "Get current visit details via QR (DOCTOR only)",
         "description": "Get current visit information including patient details using QR token.",
-        "security": [{ "bearerAuth": [] }, { "qrAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "qrAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "x-qr-token",
             "in": "header",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "QR JWT token from visit"
           }
         ],
@@ -993,7 +1292,9 @@
             "description": "Invalid or expired QR token",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -1001,7 +1302,9 @@
             "description": "Forbidden - DOCTOR role required or license expired",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -1009,26 +1312,43 @@
             "description": "Visit not found",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/doctor/add-record": {
       "post": {
         "tags": ["Doctor"],
         "summary": "Add diagnosis and prescriptions (DOCTOR only)",
         "description": "Add medical record and prescriptions for current visit. Requires valid QR token.",
-        "security": [{ "bearerAuth": [] }, { "qrAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "qrAuth": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "React",
+            "label": "Doctor Medical Record Form",
+            "source": "export const MedicalRecordForm = ({ qrToken }) => {\n  const [diagnosis, setDiagnosis] = useState('');\n  const [prescriptions, setPrescriptions] = useState([{ name: '', dosage: '', frequency: '' }]);\n  const [notes, setNotes] = useState('');\n  const [submitting, setSubmitting] = useState(false);\n  \n  const addPrescription = () => {\n    setPrescriptions([...prescriptions, { name: '', dosage: '', frequency: '' }]);\n  };\n  \n  const updatePrescription = (index, field, value) => {\n    const updated = [...prescriptions];\n    updated[index][field] = value;\n    setPrescriptions(updated);\n  };\n  \n  const submitRecord = async () => {\n    if (!diagnosis.trim()) {\n      alert('Diagnosis is required');\n      return;\n    }\n    \n    setSubmitting(true);\n    \n    try {\n      const accessToken = localStorage.getItem('accessToken');\n      \n      const response = await axios.post('/doctor/add-record', {\n        diagnosis,\n        prescriptions: prescriptions.filter(p => p.name.trim() && p.dosage.trim()),\n        notes\n      }, {\n        headers: {\n          'Authorization': `Bearer ${accessToken}`,\n          'x-qr-token': qrToken\n        }\n      });\n      \n      alert(`Record saved. Prescription ID: ${response.data.prescriptionId || 'None'}`);\n      \n      setDiagnosis('');\n      setPrescriptions([{ name: '', dosage: '', frequency: '' }]);\n      setNotes('');\n    } catch (err) {\n      alert(err.response?.data?.message || 'Failed to save record');\n    } finally {\n      setSubmitting(false);\n    }\n  };\n  \n  return (\n    <div>\n      <h3>Add Medical Record</h3>\n      \n      <div>\n        <label>Diagnosis *</label>\n        <textarea\n          value={diagnosis}\n          onChange={(e) => setDiagnosis(e.target.value)}\n          rows={3}\n          required\n        />\n      </div>\n      \n      <div>\n        <label>Prescriptions</label>\n        {prescriptions.map((prescription, index) => (\n          <div key={index}>\n            <input\n              placeholder=\"Medicine Name\"\n              value={prescription.name}\n              onChange={(e) => updatePrescription(index, 'name', e.target.value)}\n            />\n            <input\n              placeholder=\"Dosage\"\n              value={prescription.dosage}\n              onChange={(e) => updatePrescription(index, 'dosage', e.target.value)}\n            />\n            <input\n              placeholder=\"Frequency\"\n              value={prescription.frequency}\n              onChange={(e) => updatePrescription(index, 'frequency', e.target.value)}\n            />\n          </div>\n        ))}\n        <button type=\"button\" onClick={addPrescription}>\n          + Add Another Medicine\n        </button>\n      </div>\n      \n      <div>\n        <label>Notes</label>\n        <textarea\n          value={notes}\n          onChange={(e) => setNotes(e.target.value)}\n          rows={2}\n        />\n      </div>\n      \n      <button onClick={submitRecord} disabled={submitting || !diagnosis.trim()}>\n        {submitting ? 'Saving...' : 'Save Medical Record'}\n      </button>\n    </div>\n  );\n};"
+          }
+        ],
         "parameters": [
           {
             "name": "x-qr-token",
             "in": "header",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "QR JWT token from visit"
           }
         ],
@@ -1057,7 +1377,9 @@
             "description": "Invalid input data",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -1065,7 +1387,9 @@
             "description": "Invalid or expired QR token",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -1073,20 +1397,25 @@
             "description": "Forbidden - DOCTOR role required or license expired",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/pharmacy/prescription/{prescriptionId}": {
       "get": {
         "tags": ["Pharmacy"],
         "summary": "Get prescription details by ID (PHARMACIST only)",
         "description": "View prescription details using prescription ID. Pharmacist cannot see diagnosis or medical history.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "prescriptionId",
@@ -1104,7 +1433,9 @@
             "description": "Prescription details",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Prescription" }
+                "schema": {
+                  "$ref": "#/components/schemas/Prescription"
+                }
               }
             }
           },
@@ -1112,7 +1443,9 @@
             "description": "Prescription not found",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -1120,20 +1453,25 @@
             "description": "Forbidden - PHARMACIST role required",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/pharmacy/prescription/{prescriptionId}/issue": {
       "post": {
         "tags": ["Pharmacy"],
         "summary": "Issue prescription by ID (PHARMACIST only)",
         "description": "Mark prescription as issued using prescription ID. This action closes the visit and expires QR code.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "prescriptionId",
@@ -1160,7 +1498,9 @@
             "description": "Prescription already issued",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -1168,7 +1508,9 @@
             "description": "Prescription not found",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -1176,26 +1518,36 @@
             "description": "Forbidden - PHARMACIST role required",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/pharmacy/prescription/qr": {
       "get": {
         "tags": ["Pharmacy"],
         "summary": "Get prescription details via QR (PHARMACIST only)",
         "description": "View prescription details by scanning QR code. Returns prescription for current visit.",
-        "security": [{ "bearerAuth": [] }, { "qrAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "qrAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "x-qr-token",
             "in": "header",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "QR JWT token from visit"
           }
         ],
@@ -1204,7 +1556,9 @@
             "description": "Prescription details retrieved",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Prescription" }
+                "schema": {
+                  "$ref": "#/components/schemas/Prescription"
+                }
               }
             }
           },
@@ -1212,7 +1566,9 @@
             "description": "Invalid or expired QR token",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -1220,7 +1576,9 @@
             "description": "Forbidden - PHARMACIST role required",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -1228,26 +1586,43 @@
             "description": "No prescription found for this visit",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/pharmacy/prescription/qr/issue": {
       "post": {
         "tags": ["Pharmacy"],
         "summary": "Issue prescription via QR (PHARMACIST only)",
         "description": "Mark prescription as issued by scanning QR code. This action closes the visit and expires QR code.",
-        "security": [{ "bearerAuth": [] }, { "qrAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "qrAuth": []
+          }
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JavaScript",
+            "label": "Pharmacy QR Issue Workflow",
+            "source": "export const PharmacyIssue = () => {\n  const [scanning, setScanning] = useState(false);\n  const [prescription, setPrescription] = useState(null);\n  const [issuing, setIssuing] = useState(false);\n  \n  const startScanner = () => {\n    const videoElement = document.getElementById('pharmacy-qr-video');\n    const scanner = new QrScanner(videoElement, async (result) => {\n      setScanning(false);\n      scanner.stop();\n      \n      await getPrescriptionDetails(result.data);\n    });\n    \n    scanner.start();\n    setScanning(true);\n  };\n  \n  const getPrescriptionDetails = async (qrToken) => {\n    try {\n      const accessToken = localStorage.getItem('accessToken');\n      \n      const response = await axios.get('/pharmacy/prescription/qr', {\n        headers: {\n          'Authorization': `Bearer ${accessToken}`,\n          'x-qr-token': qrToken\n        }\n      });\n      \n      setPrescription({\n        ...response.data,\n        qrToken: qrToken\n      });\n    } catch (err) {\n      alert(err.response?.data?.message || 'Failed to fetch prescription');\n    }\n  };\n  \n  const issuePrescription = async () => {\n    if (!prescription) return;\n    \n    setIssuing(true);\n    \n    try {\n      const accessToken = localStorage.getItem('accessToken');\n      \n      const response = await axios.post('/pharmacy/prescription/qr/issue', {}, {\n        headers: {\n          'Authorization': `Bearer ${accessToken}`,\n          'x-qr-token': prescription.qrToken\n        }\n      });\n      \n      alert(`Prescription ${prescription.prescriptionId} issued!`);\n      setPrescription(null);\n    } catch (err) {\n      if (err.response?.data?.code === 'ALREADY_ISSUED') {\n        alert('This prescription was already issued');\n      } else {\n        alert(err.response?.data?.message || 'Failed to issue prescription');\n      }\n    } finally {\n      setIssuing(false);\n    }\n  };\n  \n  return {\n    startScanner,\n    scanning,\n    prescription,\n    issuing,\n    issuePrescription\n  };\n};"
+          }
+        ],
         "parameters": [
           {
             "name": "x-qr-token",
             "in": "header",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "QR JWT token from visit"
           }
         ],
@@ -1266,7 +1641,9 @@
             "description": "Prescription already issued",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -1274,7 +1651,9 @@
             "description": "Invalid or expired QR token",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -1282,7 +1661,9 @@
             "description": "Forbidden - PHARMACIST role required",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -1290,25 +1671,34 @@
             "description": "No prescription found for this visit",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/audit/logs": {
       "get": {
         "tags": ["Audit"],
         "summary": "Get audit logs (ADMIN only)",
         "description": "Retrieve system audit logs. Audit logs are immutable and cannot be modified.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "page",
             "in": "query",
-            "schema": { "type": "integer", "minimum": 1, "default": 1 }
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
           },
           {
             "name": "limit",
@@ -1323,22 +1713,32 @@
           {
             "name": "startDate",
             "in": "query",
-            "schema": { "type": "string", "format": "date-time" }
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           },
           {
             "name": "endDate",
             "in": "query",
-            "schema": { "type": "string", "format": "date-time" }
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           },
           {
             "name": "role",
             "in": "query",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "action",
             "in": "query",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1356,20 +1756,28 @@
             "description": "Forbidden - ADMIN role required",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
         }
       }
     },
-
     "/setup/check": {
       "get": {
         "tags": ["System"],
         "summary": "Check system setup status",
         "description": "Check if system is properly set up and see existing users",
         "security": [],
+        "x-code-samples": [
+          {
+            "lang": "JavaScript",
+            "label": "Initial Setup Check",
+            "source": "const checkSetup = async () => {\n  try {\n    const response = await axios.get('/setup/check');\n    \n    if (response.data.isFirstTimeSetup) {\n      console.log('System needs first-time setup');\n      showAdminSetupForm();\n    } else {\n      console.log(`System ready with ${response.data.userCount} users`);\n      showLoginForm();\n    }\n  } catch (error) {\n    console.error('Setup check failed:', error);\n    alert('Cannot connect to server');\n  }\n};\n\ncheckSetup();"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Setup status retrieved",
@@ -1378,17 +1786,29 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": { "type": "boolean" },
-                    "database": { "type": "string" },
-                    "userCount": { "type": "integer" },
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "database": {
+                      "type": "string"
+                    },
+                    "userCount": {
+                      "type": "integer"
+                    },
                     "users": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
-                          "nic": { "type": "string" },
-                          "name": { "type": "string" },
-                          "role": { "type": "string" },
+                          "nic": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -1396,8 +1816,12 @@
                         }
                       }
                     },
-                    "isFirstTimeSetup": { "type": "boolean" },
-                    "message": { "type": "string" }
+                    "isFirstTimeSetup": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -1406,13 +1830,16 @@
         }
       }
     },
-
     "/example/admin-only": {
       "get": {
         "tags": ["Example"],
         "summary": "Example admin-only endpoint",
         "description": "Example protected route requiring ADMIN role",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Access granted",
@@ -1428,7 +1855,9 @@
             "description": "Forbidden - ADMIN role required",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }

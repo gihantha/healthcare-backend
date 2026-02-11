@@ -26,6 +26,7 @@ exports.searchPatient = async (req, res) => {
     const { nic } = req.query;
     const patient = await PatientService.searchPatientByNIC(nic);
     return success(res, {
+      _id: patient._id,         
       patientId: patient.patientId,
       name: patient.name,
       phone: patient.phone,
@@ -41,6 +42,7 @@ exports.searchPatient = async (req, res) => {
     );
   }
 };
+
 
 exports.reissuePatientId = async (req, res) => {
   try {
